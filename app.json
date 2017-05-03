@@ -1,0 +1,30 @@
+{
+  "pages":[
+    "pages/test/test",
+    "pages/index/index",
+    "pages/like/like"
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "demo",
+    "navigationBarTextStyle":"black"
+  },
+          "tabBar": {
+            "color":"#AAAAAA",
+            "selectedColor":"rgba(26, 188, 156,1.0)",
+            "backgroundColor":"white",
+            "borderStyle": "white",
+            "list": [{
+                "pagePath": "pages/index/index",
+                "text": "首页",
+                "iconPath":"./icon/home.jpeg",
+                "selectedIconPath":"./icon/home.jpeg"
+            }, {
+                "pagePath": "pages/like/like",
+                "text": "喜欢",
+                 "iconPath":"./icon/like.jpeg",
+                "selectedIconPath":"./icon/like.jpeg"
+            }]
+        }
+}

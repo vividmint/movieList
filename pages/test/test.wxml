@@ -1,0 +1,67 @@
+<view class="container" >
+<view class="page-container">
+    <view class="list-container">
+  <!--<view class="item-container third" wx:for="{{unReadArr}}">
+  <view class="pic-box">
+      <view class="mask"></view>
+      <image class="pic" src="{{movieData[item].picObj.url}}"></image>
+      <view class="round cross" bindtap="onUnlike"><image class="icon cross-icon" src="../../icon/cross_w.png"></image></view>
+      <view class="round heart" bindtap="onLike"><image class="icon heart-icon" src="../../icon/heart.png"></image></view>
+      <view class="text-box">
+          <text class="cn-name">{{movieData[item].cnName}}</text>
+          <view class="score-box">
+              <text class="score-name">豆瓣评分：</text>
+              <text class="score">{{movieData[item].score}}</text>
+          </view>
+      </view>
+  </view>
+  <view class="detail-box">
+          <view class="detail-name">剧情简介</view>
+          <text class="detail">{{movieData[item].detail}}</text>
+      </view>
+  </view>
+
+    <view class="item-container second" wx:for="{{unReadArr}}">
+    <view class="pic-box">
+        <view class="mask"></view>
+        <image class="pic" src="{{movieData[item].picObj.url}}"></image>
+        <view class="round cross" bindtap="onUnlike"><image class="icon cross-icon" src="../../icon/cross_w.png"></image></view>
+        <view class="round heart" bindtap="onLike"><image class="icon heart-icon" src="../../icon/heart.png"></image></view>
+        <view class="text-box">
+            <text class="cn-name">{{movieData[item].cnName}}</text>
+            <view class="score-box">
+                <text class="score-name">豆瓣评分：</text>
+                <text class="score">{{movieData[item].score}}</text>
+            </view>
+        </view>
+    </view>
+    <view class="detail-box">
+            <view class="detail-name">剧情简介</view>
+            <text class="detail">{{movieData[item].detail}}</text>
+        </view>
+    </view>-->
+
+    <view class="item-container first" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
+    <view class="pic-box">
+         <image class="pic" src="{{movieData[isShowId].picObj.url}}"></image>
+         <view class="mask"></view>
+         <view class="text-box">
+             <text class="cn-name">{{movieData[isShowId].cnName}}</text>
+             <view class="score-box">
+                 <text class="score-name">豆瓣评分：</text>
+                 <text class="score">{{movieData[isShowId].score}}</text>
+             </view>
+         </view>
+    </view>
+    <view class="buttons">
+    <view class="round cross" bindtap="onUnlike"><image class="icon cross-icon" src="../../icon/cross.png"></image></view>
+    <view class="round heart" bindtap="onLike"><image class="icon heart-icon" src="../../icon/heart_big.png"></image></view>
+    <!--<view class="detail-box">
+            <view class="detail-name">剧情简介</view>
+            <text class="detail">{{movieData[isShowId].detail}}</text>
+        </view>-->
+    </view>
+    </view>
+  </view>
+  </view>
+</view>

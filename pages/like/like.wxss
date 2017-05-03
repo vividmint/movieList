@@ -1,0 +1,35 @@
+.list{
+display:flex;
+flex-direction:column;
+box-sizing:border-box;
+}
+.movie{
+display:flex;
+border-bottom:1px solid #AAAAAA;
+margin-bottom:15px;
+padding-bottom:10px;
+box-sizing:border-box;
+position:relative;
+
+}
+.pic{
+width:100px;
+height:100px;
+flex:0 0 100px;
+padding:0px 0px 0px 15px;
+}
+.heart{
+/*color:#d43242;*/
+width:30px;
+height:30px;
+position:absolute;
+top:5px;
+left:75px;
+}
+.box{
+display:flex;
+flex:0 1 auto;
+flex-direction:column;
+padding:5px 20px;
+justify-content:space-between;
+}

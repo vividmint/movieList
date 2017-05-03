@@ -1,0 +1,39 @@
+<!--index.wxml-->
+<view class="container">
+<view class="index-container">
+    <view class="movie-container first" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
+        <view class="pic-container">
+            <view class="pic-box">
+                <view class="mask"></view>
+                <image class="pic" src="{{movieData[isShowId].picObj.url}}">
+                </image>
+            </view>
+            <view class="text-box">
+                <text class="cn-name">{{movieData[isShowId].cnName}}</text>
+                <view class="score-box">
+                    <text class="score-name">豆瓣评分：</text>
+                    <text class="score">{{movieData[isShowId].score}}</text>
+                </view>
+            </view>
+        </view>
+    </view>
+    <view class="movie-container second" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
+        <view class="pic-container">
+            <view class="mask"></view>
+            <image class="pic" src="{{movieData[item].picObj.url}}">
+            </image>
+            <view class="text-box">
+                <text class="cn-name">{{movieData[isShowId].cnName}}</text>
+                <view class="score-box">
+                    <text class="score-name">豆瓣评分：</text>
+                    <text class="score">{{movieData[isShowId].score}}</text>
+                </view>
+            </view>
+        </view>
+    </view>
+    <!--<view class="detail-box">
+            <view class="detail-name">剧情简介</view>
+            <text class="detail">{{movieData[isShowId].detail}}</text>
+        </view>-->
+</view>
+</view>

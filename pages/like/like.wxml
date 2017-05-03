@@ -1,0 +1,15 @@
+<view class="container">
+<scroll-view class="list">
+<view class="movie" wx:for="{{likeArr}}">
+<image class="pic" src="{{movieData[item].picObj.url}}"></image>
+<image class="heart" src="../../icon/heart.png"></image>
+<view class="box">
+<text class="name">{{movieData[item].cnName}}</text>
+<view class="score-box">
+    <text class="score-name">豆瓣评分：</text>
+    <text class="score">{{movieData[item].score}}</text>
+</view>
+</view>
+</view>
+</scroll-view>
+</view>
