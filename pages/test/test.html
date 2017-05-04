@@ -1,8 +1,7 @@
-
 <view class="container">
     <view class="page-container">
         <view class="list-container">
-            <view id="draggable" class="item-container" animation="{{animationData}}"  bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd" style="top:{{coord.y}}px;left:{{coord.x}}px">
+            <view id="draggable" class="item-container" animation="{{animationData}}" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
                 <view class="pic-box">
                     <image class="pic" mode="scaleToFill" src="{{movieData[isShowId].picObj.url}}"></image>
                     <view class="mask"></view>

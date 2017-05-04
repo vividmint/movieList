@@ -20,7 +20,7 @@
     <view class="movie-container second" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
         <view class="pic-container">
             <view class="mask"></view>
-            <image class="pic" src="{{movieData[item].picObj.url}}">
+            <image class="pic" src="../../one.jpeg">
             </image>
             <view class="text-box">
                 <text class="cn-name">{{movieData[isShowId].cnName}}</text>

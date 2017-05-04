@@ -1,35 +1,55 @@
-.list{
-display:flex;
-flex-direction:column;
-box-sizing:border-box;
+.list {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    padding: 10px;
 }
-.movie{
-display:flex;
-border-bottom:1px solid #AAAAAA;
-margin-bottom:15px;
-padding-bottom:10px;
-box-sizing:border-box;
-position:relative;
 
+.movie {
+    display: flex;
+    align-items: center;
+    border-bottom: 2rpx solid rgb(245, 245, 245);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    box-sizing: border-box;
+    position: relative;
 }
-.pic{
-width:100px;
-height:100px;
-flex:0 0 100px;
-padding:0px 0px 0px 15px;
+
+.pic {
+    width: 50px;
+    height: 65px;
+    flex: 0 0 50px;
+    padding: 0px 0px 0px 15px;
 }
-.heart{
-/*color:#d43242;*/
-width:30px;
-height:30px;
-position:absolute;
-top:5px;
-left:75px;
+
+.heart {
+    /*color:#d43242;*/
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 5px;
+    left: 75px;
 }
-.box{
-display:flex;
-flex:0 1 auto;
-flex-direction:column;
-padding:5px 20px;
-justify-content:space-between;
+
+.box {
+    display: flex;
+    flex: 0 1 auto;
+    flex-direction: column;
+    padding: 5px 20px;
+    justify-content: center;
+}
+
+.name {
+    color: rgba(0, 0, 0, 0.8);
+    font-size: 18px;
+    text-overflow: ellipsis;
+    width: 200px;
+    overflow:hidden;
+    white-space: nowrap;
+}
+
+.score-box {
+    color: rgba(0, 0, 0, 0.5);
+    padding-top: 6px;
+    font-size: 15px;
 }

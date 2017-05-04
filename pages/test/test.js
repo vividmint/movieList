@@ -1,11 +1,18 @@
 //获取应用实例
-var app = getApp()
+var app = getApp();
+var startPoint;
 var defaultData = {
+    userInfo: {},
     touchDot: 0, //触摸时的原点
     time: 0, //  时间记录，用于滑动时且时间小于1s则执行左右滑动
     interval: "", // 记录/清理 时间记录
+    animationData: {},
+    coord: {
+        x: 0,
+        y: 0
+    },
     unReadArr: [
-      7797267,7797268,7797269
+        7797267, 7797268, 7797269
     ],
     likeArr: [],
     unlikeArr: [],
@@ -54,12 +61,6 @@ var defaultData = {
 defaultData.isShowId = defaultData.unReadArr[0];
 Page({
     data: defaultData,
-    touchStart: function(e) {
-        var touchDot = e.touches[0].pageX; // 获取触摸时的原点
-        this.setData({
-            touchDot
-        })
-    },
     onLoad: function(option) {
         // 页面初始化 options为页面跳转所带来的参数
         var windowWidth, windowHeight;
@@ -67,13 +68,36 @@ Page({
             isShowId = this.data.isShowId;
         wx.getSystemInfo({
             success: function(res) {
-                windowWidth = res.windowWidth+'px';
-                windowHeight = res.windowHeight+'px';
+                windowWidth = res.windowWidth + 'px';
+                windowHeight = res.windowHeight;
             }
+        })
+        var that = this;
+        //调用应用实例的方法获取全局数据
+        app.getUserInfo(function(userInfo) {
+            //更新数据
+            that.setData({
+                userInfo: userInfo
+            })
         })
         this.setData({
             windowWidth,
             windowHeight
+        })
+    },
+    onShow: function() {
+        this.animation = wx.createAnimation({
+            duration: 0,
+            timingFunction: 'ease',
+            transformOrigin: "50% 50%",
+            delay: 0
+        })
+    },
+    touchStart: function(e) {
+        var touchDot = e.touches[0].pageX; // 获取触摸时的原点
+        startPoint = e.touches[0];
+        this.setData({
+            touchDot
         })
     },
     //触摸移动事件
@@ -82,6 +106,24 @@ Page({
             time = this.data.time,
             touchDot = this.data.touchDot;
         // console.log("touchMove:" + touchMove + " touchDot:" + touchDot + " diff:" + (touchMove - touchDot));
+          var endPoint = e.touches[e.touches.length - 1];
+          var translateX = endPoint.clientX - startPoint.clientX;
+          var translateY = endPoint.clientY - startPoint.clientY;
+          startPoint = endPoint;
+          var y = this.data.coord.y + translateY;
+          var x = this.data.coord.x + translateX;
+          console.log(x,y);
+          if(y<-13){
+            y = 0;
+          }
+            // this.animation.rotate(5).step();
+          this.setData({
+              animationData: this.animation.export(),
+              coord: {
+                  x,
+                  y
+              }
+          })
         // 向左滑动
         if (touchMove - touchDot <= -100 && time < 5) {
             console.log('向左');
@@ -89,6 +131,12 @@ Page({
                 action: "unlike"
             });
             this.markAsRead();
+            this.setData({
+                coord: {
+                    x:0,
+                    y:0
+                }
+            })
         }
         // 向右滑动
         if (touchMove - touchDot >= 100 && time < 5) {
@@ -97,8 +145,14 @@ Page({
                 action: "like"
             });
             this.markAsRead();
+            this.setData({
+                coord: {
+                    x:0,
+                    y:0
+                }
+            })
         }
-        // touchDot = touchMove; //每移动一次把上一次的点作为原点（好像没啥用）
+        touchDot = touchMove; //每移动一次把上一次的点作为原点（好像没啥用）
     },
     // 触摸结束事件
     touchEnd: function(e) {
@@ -108,7 +162,6 @@ Page({
             time: 0,
             tmpFlag: true // 回复滑动事件
         })
-
     },
     likeAction: function(params) {
         let id = this.data.isShowId;
@@ -117,7 +170,6 @@ Page({
             unlikeArr = [];
         if (params.action === 'like') {
             obj[id].liked = 1;
-            // let likeData = this.data.likeArr.splice(obj[id], 1);
             likeArr.push(id);
         } else if (params.action === 'unlike') {
             obj[id].liked = 2;
@@ -128,7 +180,6 @@ Page({
             likeArr,
             unlikeArr
         })
-        console.log(this.data);
     },
     onLike: function() {
         let id = this.data.isShowId;
@@ -144,11 +195,11 @@ Page({
         let id = this.data.isShowId;
         let unlikeArr = [];
         this.data.movieData[id].liked = 2;
-                unlikeArr.push(id);
-            this.setData({
-                unlikeArr
-            })
-            this.markAsRead();
+        unlikeArr.push(id);
+        this.setData({
+            unlikeArr
+        })
+        this.markAsRead();
     },
     markAsRead: function() {
         let id = this.data.isShowId;
@@ -162,5 +213,17 @@ Page({
             isShowId: unReadArr[1]
         })
         unReadArr.shift();
+        console.log(this.data);
+    },
+    toUserList: function() {
+        try {
+            wx.navigateTo({
+                url: '../like/like'
+            });
+        } catch (e) {
+            console.log(e);
+        } finally {
+
+        }
     }
 })
