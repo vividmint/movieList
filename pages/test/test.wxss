@@ -1,28 +1,23 @@
 /* pages/test/test.wxss */
 .page-container{
-    padding:30rpx 40rpx;
-    background-color:rgb(246,247,251);
+    background-color:#f2f3f9;
     height:100%;
+    width:100%;
     box-sizing:border-box;
-    display: flex;
-    flex-direction:column;
-    justify-content: center;
     align-items:center;
+    overflow:hidden;
 }
 .list-container{
     position: relative;
     box-sizing:border-box;
-    width:100%;
-    flex-grow:3;
-    flex-shrink:1;
-    flex-basis:auto;
+    height:75%;
 }
 .item-container{
     position: absolute;
-    display: flex;
-    flex-direction:column;
+    box-sizing:border-box;
     width:100%;
     height:100%;
+    padding:0rpx 40rpx;
     border-radius: 0px 0px 11px 11px;
     box-sizing:border-box;
 }
@@ -88,8 +83,9 @@
     display:flex;
     justify-content:space-between;
     box-sizing:border-box;
-    height:25%;
+    height:150px;
     align-items: center;
+    padding:0rpx 40rpx;
 }
 .round-container {
     box-sizing:border-box;
@@ -112,6 +108,7 @@
 .cross-icon {
     width:30px;
     height:30px;
+    margin-top:6rpx;
 }
 .user-icon {
     width:55px;
@@ -123,7 +120,7 @@
 .heart-icon {
     width:38px;
     height:32px;
-    margin-top:4px;
+    margin-top:10rpx;
 }
 .userinfo {
   display: flex;
