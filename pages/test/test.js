@@ -11,7 +11,7 @@ let defaultData = {
     isAnimation: false,
     userInfo: {},
     touchDot: 0, //触摸时的原点
-    interval: "", // 记录/清理 时间记录
+    slideTime: 0,
     coord: {
         x: 0,
         y: 0
@@ -96,14 +96,16 @@ Page({
         })
     },
     onReady: function() {
-        this.animation = wx.createAnimation({
-            duration: 250,
-            timingFunction: 'ease',
-            delay: 0
-        })
     },
     touchStart: function(e) {
         touch.startPoint = e.touches[0];
+        this.animation = wx.createAnimation({
+            duration: 80,
+            timingFunction: 'ease',
+            delay: 0
+        })
+
+
     },
     //触摸移动事件
     touchMove: function(e) {
@@ -111,11 +113,6 @@ Page({
         let currentPoint = e.touches[e.touches.length - 1];
         let translateX = currentPoint.clientX - touch.startPoint.clientX;
         let translateY = currentPoint.clientY - touch.startPoint.clientY;
-        this.animation = wx.createAnimation({
-            duration: 70,
-            timingFunction: 'ease',
-            delay: 0
-        })
 
         if (translateX < 0) {
             if (translateX > -10) {
@@ -136,119 +133,94 @@ Page({
         // } else {
         //     rotate = Math.atan(translateX / translateY) * 3;
         // }
-        this.animation.rotate(rotate).translate(translateX, 0).step();
+        this.animation.rotate(rotate).translate(translateX, 10).step();
+        let id = this.data.isShowId;
         movieData = this.data.movieData;
-        movieData[this.data.isShowId].animationData = this.animation.export();
+        movieData[id].animationData = this.animation.export();
         this.setData({
             movieData
         })
-        touch.translateX = translateX;
-        touch.translateY = translateY;
+        if (translateX >= 35) {
+            console.log('右划')
 
-        if(!this.data.isAnimation){
-          if (translateX >= 35) {
-              console.log('右划')
-              this.animation.rotate(10).translate(this.data.windowWidth+100, 0).step();
-              movieData = this.data.movieData;
-              movieData[this.data.isShowId].animationData = this.animation.export();
-              this.markAsRead();
-          }
-          if (translateX <= -35) {
-              console.log('左划')
-              this.animation.rotate(10).translate(-this.data.windowWidth-100, 0).step();
-              movieData = this.data.movieData;
-              movieData[this.data.isShowId].animationData = this.animation.export();
-              this.markAsRead();
-          }
-          this.setData({
-              movieData,
-              isAnimation:true
-          })
         }
+        if (translateX <= -35) {
+            console.log('左划')
+
+        }
+
     },
     // 触摸结束事件
     touchEnd: function(e) {
+        // return;
         let movieData;
-        if (e.changedTouches[0].clientX > 340) {
+        let translateX = e.changedTouches[0].clientX - touch.startPoint.clientX;
+        let translateY = e.changedTouches[0].clientY - touch.startPoint.clientY;
+        console.log("end", translateX);
+        let id = this.data.isShowId;
+        let animation = wx.createAnimation({
+            duration:300,
+            timingFunction: 'ease',
+            delay: 0
+        })
+        if (translateX > 170) {
             //右划
-            this.animation.translate(this.data.windowWidth, 0).step();
-            movieData = this.data.movieData;
-            movieData[this.data.isShowId].animationData = this.animation.export();
             this.markAsRead();
-        } else if (e.changedTouches[0].clientX < 70) {
+            animation.rotate(0).translate(this.data.windowWidth, 0).step();
+            movieData = this.data.movieData;
+            movieData[id].animationData = animation.export();
+            this.setData({
+                movieData
+            })
+        } else if (translateX < -170) {
             //左划
-            this.animation.translate(-this.data.windowWidth, 0).step();
-            movieData = this.data.movieData;
-            movieData[this.data.isShowId].animationData = this.animation.export();
             this.markAsRead();
+            animation.rotate(0).translate(-this.data.windowWidth, 0).step();
+            movieData = this.data.movieData;
+            movieData[id].animationData = animation.export();
+            this.setData({
+                movieData
+            })
         } else {
             //返回原位置
-            this.animation.rotate(0).translate(0, 0).step();
-            this.setData({
-                isAnimation:false
+            let animation = wx.createAnimation({
+                duration: 250,
+                timingFunction: 'ease',
+                delay: 0
             })
-
+            animation.rotate(0).translate(0, 0).step();
             movieData = this.data.movieData;
-            movieData[this.data.isShowId].animationData = this.animation.export();
+            movieData[this.data.isShowId].animationData = animation.export();
+            this.setData({
+                movieData,
+            })
         }
 
-        this.setData({
-            movieData
-        })
+
 
     },
-    likeAction: function(params) {
-        let id = this.data.isShowId;
-        let obj = this.data.movieData;
-        let likeArr = [],
-            unlikeArr = [];
-        if (params.action === 'like') {
-            obj[id].liked = 1;
-            likeArr.push(id);
-        } else if (params.action === 'unlike') {
-            obj[id].liked = 2;
-            unlikeArr.push(id);
-        }
-        this.setData({
-            movieData: obj,
-            likeArr,
-            unlikeArr
-        })
-    },
+
     onLike: function() {
+        this.clickAnimation({
+            direction: 'right'
+        });
         let id = this.data.isShowId;
-        let likeArr = [];
-        this.data.movieData[id].liked = 1;
+        let likeArr = this.data.likeArr;
         likeArr.push(id);
-        this.animation.rotate(10).translate(this.data.windowWidth + 100, 100).step();
-        let movieData;
-        movieData = this.data.movieData;
-        movieData[id].animationData = this.animation.export();
-
         this.setData({
-            movieData,
             likeArr
         })
         this.markAsRead();
     },
     onUnlike: function() {
-        this.animation = wx.createAnimation({
-            duration: 400,
-            timingFunction: 'ease',
-            delay: 0
-        })
+        this.clickAnimation({
+            direction: 'left'
+        });
         let id = this.data.isShowId;
-        let unlikeArr = [];
-        this.data.movieData[id].liked = 2;
+        let unlikeArr = this.data.unlikeArr;
         unlikeArr.push(id);
 
-        this.animation.rotate(-10).translate(-this.data.windowWidth - 100, 100).step();
-        let movieData;
-        movieData = this.data.movieData;
-        movieData[id].animationData = this.animation.export();
-
         this.setData({
-            movieData,
             unlikeArr
         })
         this.markAsRead();
@@ -260,8 +232,32 @@ Page({
         let i = unReadArr.indexOf(id);
         let nextId = unReadArr[i + 1];
         this.setData({
-            isShowId: nextId,
-            isAnimation:false
+            isShowId: nextId
+        })
+    },
+    clickAnimation: function(params) {
+        let x, y, duration, rotate, movieData;
+        duration = 700;
+        y = 100;
+        if (params.direction === 'left') {
+            rotate = -10;
+            x = -this.data.windowWidth - 100;
+        } else {
+            rotate = 10;
+            x = this.data.windowWidth + 100;
+        }
+
+        this.animation = wx.createAnimation({
+            duration,
+            timingFunction: 'ease',
+            delay: 0
+        })
+        let id = this.data.isShowId;
+        this.animation.rotate(rotate).translate(x, y).step();
+        movieData = this.data.movieData;
+        movieData[id].animationData = this.animation.export();
+        this.setData({
+            movieData
         })
     },
     toUserList: function() {

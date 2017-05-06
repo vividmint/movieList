@@ -17,7 +17,7 @@
 
 .pic {
     width: 50px;
-    height: 65px;
+    height: 70px;
     flex: 0 0 50px;
     padding: 0px 0px 0px 15px;
 }
