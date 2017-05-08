@@ -11,6 +11,7 @@
     position: relative;
     box-sizing:border-box;
     height:75%;
+    padding-top:10px;
 }
 .item-container{
     position: absolute;
@@ -47,17 +48,17 @@
     left:0;
     bottom:0;
     color:white;
-    box-sizing:border-box;
 }
 .cn-name {
     font-size: 26px;
     font-weight: 700;
-    line-height: 1.4;
+
 }
 
 .score-box {
-    padding-top: 10px;
+    padding-top: 30rpx;
     font-size: 22px;
+
 }
 
 .score {

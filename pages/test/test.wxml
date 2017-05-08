@@ -2,12 +2,12 @@
 <view class="container">
     <scroll-view class="page-container">
         <view class="list-container" style="width:{{windowWidth}}px;">
-            <view wx:for="{{unReadArr}}" wx:key="{{item}}" style="z-index:{{movieData[item].index}};" class="item-container" animation="{{movieData[item].animationData}}"  bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
+            <view wx:for="{{listArr}}" wx:key="{{item}}" style="z-index:{{movieData[item].zIndex}};" class="item-container" animation="{{movieData[item].animationData}}"  bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
                 <view class="pic-box">
-                    <image class="pic" mode="scaleToFill" src="{{movieData[item].picObj.url}}"></image>
+                    <image class="pic" mode="scaleToFill" src="{{movieData[item].picUrl}}"></image>
                     <view class="mask"></view>
                     <view class="text-box">
-                        <text class="cn-name">{{movieData[item].cnName}}</text>
+                        <text class="cn-name">{{movieData[item].name}}</text>
                         <view class="score-box">
                             <text class="score-name">豆瓣评分：</text>
                             <text class="score">{{movieData[item].score}}</text>

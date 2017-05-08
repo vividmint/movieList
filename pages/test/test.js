@@ -1,81 +1,38 @@
 //获取应用实例
 let app = getApp();
+let getList = require('../../load.js')
 let touch = {
     //拖拽数据
     startPoint: null,
     translateX: null,
-    translateY: null
+    translateY: null,
+    timeStampStart: null,
+    timeStampEnd: null
 };
-
 let defaultData = {
+    zIndex: 100000,
+    page: 0,
     isAnimation: false,
     userInfo: {},
     touchDot: 0, //触摸时的原点
-    slideTime: 0,
     coord: {
         x: 0,
         y: 0
     },
-    unReadArr: [
-        7797267, 7797268, 7797269
-    ],
+    idSets: null,
+    listArr: null,
     likeArr: [],
     unlikeArr: [],
-    movieData: {
-        7797267: {
-            messageId: 7797267,
-            picObj: {
-                width: 600,
-                height: 337,
-                url: '../../one.jpeg'
-            },
-            cnName: '你的名字你的名字你的名字你的名字',
-            score: '8.4',
-            detail: '在远离大都会的小山村，住着巫女世家出身的高中女孩宫水三叶（上白石萌音 配音）。校园和家庭的原因本就让她充满烦恼，而近一段时间发生的奇怪事件，又让三叶摸不清头脑。不知从何时起，...',
-            liked: 0,
-            isShow: true,
-            animationData: {},
-            index: 2
-        },
-        7797268: {
-            detail: "《一条狗的使命》3月3日上映，豆瓣8分。 拉斯·霍尔斯道姆执导，影片讲述了一条狗经历多次重生，在一次次生命的轮回中寻找不同的使命，最后又回到了最初的主人身边的故事。豆瓣热门短评：“催泪型温情片，故事比较俗套但是不影响好看啊。”",
-            messageId: 7797268,
-            cnName: "一条狗的使命",
-            score: 8.0,
-            picObj: {
-                width: 424,
-                height: 600,
-                url: "https://cdn.ruguoapp.com/FueNyDQcxhc9o0zeQjtqhTGOXPOd.jpg?imageView2/0/h/1000/interlace/0/q/80"
-            },
-            liked: 0,
-            isShow: false,
-            animationData: {},
-            index: 1
-        },
-        7797269: {
-            messageId: 7797269,
-            picObj: {
-                width: 600,
-                height: 337,
-                url: '../../fine.jpg'
-            },
-            cnName: '金刚狼3：殊死一战',
-            score: '8.3',
-            detail: '詹姆斯·曼高德执导，休·杰克曼最后一次饰演金刚狼。该片根据漫威漫画改编，故事背景设定在2029年，讲述迈入暮年的金刚狼渐渐失去了体内的自愈因子，当一个与他能力相似的变种人劳拉出现，金刚狼决定出山保护劳拉的故事。',
-            liked: 0,
-            isShow: false,
-            animationData: {},
-            index: 0
-        },
-    }
+    movieData: {}
 }
-defaultData.isShowId = defaultData.unReadArr[0];
+
 Page({
     data: defaultData,
     onLoad: function(option) {
-        let windowWidth, windowHeight;
-        let movieData = this.data.movieData,
-            isShowId = this.data.isShowId;
+        let windowWidth, windowHeight, isShowId, listArr, zIndex;
+
+        let movieData = this.data.movieData;
+
         wx.getSystemInfo({
             success: function(res) {
                 windowWidth = res.windowWidth;
@@ -87,24 +44,48 @@ Page({
         app.getUserInfo(function(userInfo) {
             //更新数据
             that.setData({
-                userInfo: userInfo
+                userInfo
             })
         })
+        getList.getMovieData({
+            page: this.data.page,
+            success: ({
+                movieData,
+                idSets
+            }) => {
+                listArr = Array.from(idSets);
+                isShowId = listArr[0];
+                let zIndex;
+                for (let i = 0; i < listArr.length; i++) {
+                    zIndex = this.data.zIndex - i;
+                    movieData[listArr[i]].zIndex = zIndex;
+                }
+                that.setData({
+                    movieData,
+                    idSets,
+                    isShowId,
+                    listArr,
+                    zIndex
+                })
+            }
+        })
+
         this.setData({
             windowWidth,
             windowHeight
         })
     },
-    onReady: function() {
-    },
     touchStart: function(e) {
         touch.startPoint = e.touches[0];
+        let timeStampStart = new Date().getTime();
         this.animation = wx.createAnimation({
-            duration: 80,
+            duration: 70,
             timingFunction: 'ease',
             delay: 0
         })
-
+        this.touch = {
+            timeStampStart
+        }
 
     },
     //触摸移动事件
@@ -128,11 +109,6 @@ Page({
                 rotate = 4;
             }
         }
-        // if (translateX < 0) {
-        //     rotate = 1/Math.atan(translateY/ translateX);
-        // } else {
-        //     rotate = Math.atan(translateX / translateY) * 3;
-        // }
         this.animation.rotate(rotate).translate(translateX, 10).step();
         let id = this.data.isShowId;
         movieData = this.data.movieData;
@@ -140,14 +116,6 @@ Page({
         this.setData({
             movieData
         })
-        if (translateX >= 35) {
-            console.log('右划')
-
-        }
-        if (translateX <= -35) {
-            console.log('左划')
-
-        }
 
     },
     // 触摸结束事件
@@ -156,48 +124,77 @@ Page({
         let movieData;
         let translateX = e.changedTouches[0].clientX - touch.startPoint.clientX;
         let translateY = e.changedTouches[0].clientY - touch.startPoint.clientY;
-        console.log("end", translateX);
+        let timeStampEnd = new Date().getTime();
+        let time = timeStampEnd - this.touch.timeStampStart;
+        console.log(time)
         let id = this.data.isShowId;
         let animation = wx.createAnimation({
-            duration:300,
+            duration: 250,
             timingFunction: 'ease',
             delay: 0
         })
-        if (translateX > 170) {
-            //右划
-            this.markAsRead();
-            animation.rotate(0).translate(this.data.windowWidth, 0).step();
-            movieData = this.data.movieData;
-            movieData[id].animationData = animation.export();
-            this.setData({
-                movieData
-            })
-        } else if (translateX < -170) {
-            //左划
-            this.markAsRead();
-            animation.rotate(0).translate(-this.data.windowWidth, 0).step();
-            movieData = this.data.movieData;
-            movieData[id].animationData = animation.export();
-            this.setData({
-                movieData
-            })
+        if (time < 150) {
+            //快速滑动
+            if (translateX > 60) {
+                //右划
+                console.log('右划...')
+                this.markAsRead();
+                animation.rotate(0).translate(this.data.windowWidth, 0).step();
+                movieData = this.data.movieData;
+                movieData[id].animationData = animation.export();
+                this.setData({
+                    movieData
+                })
+            } else if (translateX < -60) {
+                //左划
+                console.log('左划...')
+                this.markAsRead();
+                animation.rotate(0).translate(-this.data.windowWidth, 0).step();
+                movieData = this.data.movieData;
+                movieData[id].animationData = animation.export();
+                this.setData({
+                    movieData
+                })
+            } else {
+                //返回原位置
+                animation.rotate(0).translate(0, 0).step();
+                movieData = this.data.movieData;
+                movieData[this.data.isShowId].animationData = animation.export();
+                this.setData({
+                    movieData,
+                })
+            }
         } else {
-            //返回原位置
-            let animation = wx.createAnimation({
-                duration: 250,
-                timingFunction: 'ease',
-                delay: 0
-            })
-            animation.rotate(0).translate(0, 0).step();
-            movieData = this.data.movieData;
-            movieData[this.data.isShowId].animationData = animation.export();
-            this.setData({
-                movieData,
-            })
+            if (translateX > 160) {
+                //右划
+                console.log('右划...')
+                this.markAsRead();
+                animation.rotate(0).translate(this.data.windowWidth, 0).step();
+                movieData = this.data.movieData;
+                movieData[id].animationData = animation.export();
+                this.setData({
+                    movieData
+                })
+            } else if (translateX < -160) {
+                //左划
+                console.log('左划...')
+                this.markAsRead();
+                animation.rotate(0).translate(-this.data.windowWidth, 0).step();
+                movieData = this.data.movieData;
+                movieData[id].animationData = animation.export();
+                this.setData({
+                    movieData
+                })
+            } else {
+                //返回原位置
+                animation.rotate(0).translate(0, 0).step();
+                movieData = this.data.movieData;
+                movieData[this.data.isShowId].animationData = animation.export();
+                this.setData({
+                    movieData,
+                })
+            }
         }
-
-
-
     },
 
     onLike: function() {
@@ -228,12 +225,23 @@ Page({
     markAsRead: function() {
         let id = this.data.isShowId;
         let movieData = this.data.movieData;
-        let unReadArr = this.data.unReadArr;
-        let i = unReadArr.indexOf(id);
-        let nextId = unReadArr[i + 1];
+        let listArr = this.data.listArr;
+        let result = this.finRemainArr({
+            listArr,
+            id
+        });
+        // this.deleteItem(id)
+
+        if (result <= 1) {
+            this.loadMore();
+        }
+        let i = listArr.indexOf(id);
+        let nextId = listArr[i + 1];
         this.setData({
             isShowId: nextId
         })
+        console.log('mark', this.data.isShowId)
+
     },
     clickAnimation: function(params) {
         let x, y, duration, rotate, movieData;
@@ -258,6 +266,49 @@ Page({
         movieData[id].animationData = this.animation.export();
         this.setData({
             movieData
+        })
+    },
+    finRemainArr: function(params) {
+        let lastArr;
+        let i = params.listArr.indexOf(params.id) + 1;
+        lastArr = [].concat(params.listArr).splice(i);
+        return lastArr.length;
+    },
+    loadMore: function() {
+        console.log('more')
+        let page = ++this.data.page;
+        let _movieData, _listArr, _isShowId;
+        getList.getMovieData({
+            page,
+            success: ({
+                movieData,
+                idSets,
+            }) => {
+                _movieData = Object.assign({}, this.data.movieData, movieData);
+                _listArr = Array.from(idSets);
+                let zIndex = this.data.zIndex;
+                for (let i = 0; i < _listArr.length; i++) {
+                    zIndex--;
+                    _movieData[_listArr[i]].zIndex = zIndex;
+                }
+                let listArrPlus = this.data.listArr.concat(_listArr);
+                this.setData({
+                    movieData: _movieData,
+                    listArr: listArrPlus,
+                    zIndex
+                })
+            }
+        })
+        console.log(this.data.isShowId)
+    },
+    deleteItem: function(id) {
+        let index = this.data.listArr.indexOf(id);
+        let listArr = [].concat(this.data.listArr);
+        if (index >= 5) {
+            listArr.splice(0, 3);
+        }
+        this.setData({
+            listArr
         })
     },
     toUserList: function() {
