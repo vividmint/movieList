@@ -1,13 +1,14 @@
 {
-  "pages":[
+  "pages": [
+    "pages/demo",
     "pages/test/test",
-        "pages/like/like",
+    "pages/like/like",
     "pages/index/index"
   ],
-  "window":{
-    "backgroundTextStyle":"light",
+  "window": {
+    "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "demo",
-    "navigationBarTextStyle":"black"
+    "navigationBarTextStyle": "black"
   }
 }

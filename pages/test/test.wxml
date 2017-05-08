@@ -2,7 +2,9 @@
 <view class="container">
     <scroll-view class="page-container">
         <view class="list-container" style="width:{{windowWidth}}px;">
-            <view wx:for="{{listArr}}" wx:key="{{item}}" style="z-index:{{movieData[item].zIndex}};" class="item-container" animation="{{movieData[item].animationData}}"  bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
+            <view wx:for="{{listArr}}" wx:key="{{item}}" >
+            <block wx:if="{{movieData[item].isRender}}">
+            <view style="z-index:{{movieData[item].zIndex}};" class="item-container" animation="{{movieData[item].animationData}}"  bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
                 <view class="pic-box">
                     <image class="pic" mode="scaleToFill" src="{{movieData[item].picUrl}}"></image>
                     <view class="mask"></view>
@@ -14,7 +16,8 @@
                         </view>
                     </view>
                 </view>
-
+                </view>
+                </block>
             </view>
         </view>
         <view class="buttons">

@@ -1,32 +1,49 @@
 import {
-    HOST_PORT
+    HOST,
+    LIMIT
 } from 'constans.js';
 
 var getList = {
     getMovieData: function(params) {
-        let page = params.page;
+        let objectId = params.fromId;
         console.log(params)
-        this.request({
-            // url: `${HOST_PORT}/classes/TodoFolder?page=${page}`,
-            url:HOST_PORT+'/api/list?page='+page,
+        let where = {};
+        if (objectId) {
+            where.objectId = {
+                $gt: objectId
+            }
+        }
+        let whereStr = encodeURIComponent(JSON.stringify(where))
+        this.leancloudRequest({
+            url: `${HOST}/classes/TodoFolder?limit=${LIMIT}&where=${whereStr}`,
             success: (data) => {
-              if (!data) {
-                  // alert('当前暂时没有新的电影了~');
-                  return;
-              }
-              let arr = data.data;
-                // let arr = data;
+                if (!data) {
+                    // alert('当前暂时没有新的电影了~');
+                    return;
+                }
+                // let arr = data.data;
+                let arr = data;
                 let _data = {},
                     idSets = new Set();
                 for (let i = 0; i < arr.length; ++i) {
                     let id = arr[i].objectId;
                     _data[id] = arr[i];
                     idSets.add(id);
+                    _data[id].isRender = true;
                 }
                 params.success({
                     movieData: _data,
                     idSets
                 });
+            }
+        })
+    },
+    clickLike: function() {
+        this.leancloudRequest({
+            url: `${HOST}/classes/LikeList?page=${page}`,
+            method: "POST",
+            success: () => {
+
             }
         })
     },

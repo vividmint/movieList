@@ -1,6 +1,7 @@
 //获取应用实例
 let app = getApp();
 let getList = require('../../load.js')
+let zIndex = 10000 //zindex全局变量
 let touch = {
     //拖拽数据
     startPoint: null,
@@ -10,9 +11,7 @@ let touch = {
     timeStampEnd: null
 };
 let defaultData = {
-    zIndex: 100000,
-    page: 0,
-    isAnimation: false,
+    slideTimes: 0,
     userInfo: {},
     touchDot: 0, //触摸时的原点
     coord: {
@@ -29,7 +28,7 @@ let defaultData = {
 Page({
     data: defaultData,
     onLoad: function(option) {
-        let windowWidth, windowHeight, isShowId, listArr, zIndex;
+        let windowWidth, windowHeight, isShowId, listArr;
 
         let movieData = this.data.movieData;
 
@@ -48,38 +47,38 @@ Page({
             })
         })
         getList.getMovieData({
-            page: this.data.page,
             success: ({
                 movieData,
                 idSets
             }) => {
                 listArr = Array.from(idSets);
                 isShowId = listArr[0];
-                let zIndex;
                 for (let i = 0; i < listArr.length; i++) {
-                    zIndex = this.data.zIndex - i;
-                    movieData[listArr[i]].zIndex = zIndex;
+                    movieData[listArr[i]].zIndex = --zIndex;
                 }
                 that.setData({
                     movieData,
                     idSets,
                     isShowId,
                     listArr,
-                    zIndex
-                })
-                console.log('listAr1r',this.data.listArr)
 
-                setTimeout(()=>{
-                  listArr = [
-                    ...this.data.listArr
-                  ];
-                  listArr.shift();
-                  console.log('listArr2',listArr)
-                  this.setData({
-                    listArr:listArr,
-                    isShowId:listArr[0]
-                  })
-                },3000)
+                })
+                console.log('listAr1r', this.data.listArr)
+                // var xxx = 0;
+                // setInterval(()=>{
+                //   listArr = [
+                //     ...this.data.listArr
+                //   ];
+                //   var id = listArr[xxx++];
+                //   console.log('listArr2',listArr)
+                //   let _movieData = this.data.movieData;
+                //    _movieData[id].isShow = false;
+                //   this.setData({
+                //     listArr:listArr,
+                //     movieData:_movieData
+                //     // isShowId:listArr[0]
+                //   })
+                // },1500)
             }
         })
 
@@ -139,7 +138,6 @@ Page({
         let translateY = e.changedTouches[0].clientY - touch.startPoint.clientY;
         let timeStampEnd = new Date().getTime();
         let time = timeStampEnd - this.touch.timeStampStart;
-        console.log(time)
         let id = this.data.isShowId;
         let animation = wx.createAnimation({
             duration: 250,
@@ -239,22 +237,25 @@ Page({
         let id = this.data.isShowId;
         let movieData = this.data.movieData;
         let listArr = this.data.listArr;
-        let result = this.finRemainArr({
+        let length = this.finRemainArrLength({
             listArr,
             id
         });
-        this.deleteItem(id)
-
-        if (result <= 1) {
+        let slideTimes = this.data.slideTimes;
+        slideTimes++;
+        if (length <= 1) {
             this.loadMore();
         }
         let i = listArr.indexOf(id);
         let nextId = listArr[i + 1];
-        this.setData({
-            isShowId: nextId
-        })
-        console.log('mark', this.data.isShowId)
 
+        this.setData({
+            isShowId: nextId,
+            slideTimes
+        })
+        if (this.data.slideTimes >= 4) {
+            this.deleteItem(id)
+        }
     },
     clickAnimation: function(params) {
         let x, y, duration, rotate, movieData;
@@ -281,18 +282,16 @@ Page({
             movieData
         })
     },
-    finRemainArr: function(params) {
-        let lastArr;
+    finRemainArrLength: function(params) {
         let i = params.listArr.indexOf(params.id) + 1;
-        lastArr = [].concat(params.listArr).splice(i);
-        return lastArr.length;
+        return params.listArr.slice(i).length;
     },
     loadMore: function() {
         console.log('more')
-        let page = ++this.data.page;
-        let _movieData, _listArr, _isShowId;
+        let _movieData, _listArr, _isShowId, fromId;
+        fromId = [].concat(this.data.listArr).pop()
         getList.getMovieData({
-            page,
+            fromId: fromId,
             success: ({
                 movieData,
                 idSets,
@@ -304,16 +303,14 @@ Page({
                 _movieData = Object.assign({}, this.data.movieData, movieData);
                 _listArr = Array.from(idSets);
                 console.log('-', _listArr)
-                let zIndex = this.data.zIndex;
                 for (let i = 0; i < _listArr.length; i++) {
-                    zIndex--;
-                    _movieData[_listArr[i]].zIndex = zIndex;
+                    _movieData[_listArr[i]].zIndex = --zIndex;
+                    _movieData[_listArr[i]].isRender = true;
                 }
                 let listArrPlus = this.data.listArr.concat(_listArr);
                 this.setData({
                     movieData: _movieData,
-                    listArr: listArrPlus,
-                    zIndex
+                    listArr: listArrPlus
                 })
             }
         })
@@ -323,18 +320,20 @@ Page({
         let listArr = [].concat(this.data.listArr);
         let _listArr;
         if (index >= 3) {
-            _listArr = listArr.slice(index);
-            console.log('slice', _listArr)
-            let isShowId = _listArr[0];
-            this.setData({
-                listArr: _listArr,
-                isShowId
-            })
-            if(this.data.listArr.length<=3){
-              this.loadMore();
-            }
-        }
+            setTimeout(() => {
+                let movieData = Object.assign({}, this.data.movieData);
+                for (let i = 0; i < index - 2; i++) {
+                  let id = listArr[i];
+                    movieData[id].isRender = false;
+                }
+                this.setData({
+                    slideTimes: 0,
+                    movieData
+                })
+                console.log(JSON.parse(JSON.stringify(this.data)));
+            }, 1000)
 
+        }
         console.log('delete', this.data.listArr)
     },
     toUserList: function() {
