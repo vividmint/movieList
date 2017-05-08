@@ -9,7 +9,7 @@
                     <view class="text-box">
                         <text class="cn-name">{{movieData[item].name}}</text>
                         <view class="score-box">
-                            <text class="score-name">豆瓣评分：</text>
+                            <text class="score-name">豆瓣评分：{{listArr.length}}</text>
                             <text class="score">{{movieData[item].score}}</text>
                         </view>
                     </view>

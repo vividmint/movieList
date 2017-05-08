@@ -67,6 +67,19 @@ Page({
                     listArr,
                     zIndex
                 })
+                console.log('listAr1r',this.data.listArr)
+
+                setTimeout(()=>{
+                  listArr = [
+                    ...this.data.listArr
+                  ];
+                  listArr.shift();
+                  console.log('listArr2',listArr)
+                  this.setData({
+                    listArr:listArr,
+                    isShowId:listArr[0]
+                  })
+                },3000)
             }
         })
 
@@ -230,7 +243,7 @@ Page({
             listArr,
             id
         });
-        // this.deleteItem(id)
+        this.deleteItem(id)
 
         if (result <= 1) {
             this.loadMore();
@@ -284,8 +297,13 @@ Page({
                 movieData,
                 idSets,
             }) => {
+                if (idSets.size === '0') {
+                    alert('当前暂时没有新的电影了~');
+                    return;
+                }
                 _movieData = Object.assign({}, this.data.movieData, movieData);
                 _listArr = Array.from(idSets);
+                console.log('-', _listArr)
                 let zIndex = this.data.zIndex;
                 for (let i = 0; i < _listArr.length; i++) {
                     zIndex--;
@@ -299,17 +317,25 @@ Page({
                 })
             }
         })
-        console.log(this.data.isShowId)
     },
     deleteItem: function(id) {
         let index = this.data.listArr.indexOf(id);
         let listArr = [].concat(this.data.listArr);
-        if (index >= 5) {
-            listArr.splice(0, 3);
+        let _listArr;
+        if (index >= 3) {
+            _listArr = listArr.slice(index);
+            console.log('slice', _listArr)
+            let isShowId = _listArr[0];
+            this.setData({
+                listArr: _listArr,
+                isShowId
+            })
+            if(this.data.listArr.length<=3){
+              this.loadMore();
+            }
         }
-        this.setData({
-            listArr
-        })
+
+        console.log('delete', this.data.listArr)
     },
     toUserList: function() {
         try {

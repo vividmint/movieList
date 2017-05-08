@@ -6,11 +6,16 @@ var getList = {
     getMovieData: function(params) {
         let page = params.page;
         console.log(params)
-        this.leancloudRequest({
-            url: `${HOST_PORT}/classes/TodoFolder?page=${page}`,
+        this.request({
+            // url: `${HOST_PORT}/classes/TodoFolder?page=${page}`,
+            url:HOST_PORT+'/api/list?page='+page,
             success: (data) => {
-              console.log('lll',data);
-                let arr = data;
+              if (!data) {
+                  // alert('当前暂时没有新的电影了~');
+                  return;
+              }
+              let arr = data.data;
+                // let arr = data;
                 let _data = {},
                     idSets = new Set();
                 for (let i = 0; i < arr.length; ++i) {
