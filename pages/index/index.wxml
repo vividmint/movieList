@@ -1,8 +1,8 @@
 
 <view class="container">
     <scroll-view class="page-container">
-        <view class="list-container" style="width:{{windowWidth}}px;">
-            <view wx:for="{{listArr}}" wx:key="{{item}}" >
+        <view class="list-container"  wx:if="{{!isLoadingEnd}}" style="width:{{windowWidth}}px;">
+            <view wx:for="{{listArr}}" wx:key="{{item}}">
             <block wx:if="{{movieData[item].isRender}}">
             <view style="z-index:{{movieData[item].zIndex}};" class="item-container" animation="{{movieData[item].animationData}}"  bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
                 <view class="pic-box">
@@ -11,7 +11,7 @@
                     <view class="text-box">
                         <text class="cn-name">{{movieData[item].name}}</text>
                         <view class="score-box">
-                            <text class="score-name">豆瓣评分：{{listArr.length}}</text>
+                            <text class="score-name">豆瓣评分：</text>
                             <text class="score">{{movieData[item].score}}</text>
                         </view>
                     </view>
@@ -20,6 +20,7 @@
                 </block>
             </view>
         </view>
+        <view wx:elif="{{isLoadingEnd}}" class="end noMore">没有更多了~</view>
         <view class="buttons">
             <view class="round-container" bindtap="onUnlike">
                 <view class="cross">

@@ -7,7 +7,20 @@ const AV = require('./utils/av-weapp-min.js');
 
 var load = {
     getMovieData: function(params) {
-        let objectId = params.fromId;
+        let objectId;
+        if (params.fromId) {
+            objectId = params.fromId;
+        } else {
+            try {
+                var lastViewId = wx.getStorageSync('lastViewId');
+                if (lastViewId) {
+                    objectId = lastViewId;
+                }
+            } catch (e) {
+                console.log(e)
+            }
+        }
+
         let where = {};
         if (objectId) {
             where.objectId = {
@@ -18,9 +31,6 @@ var load = {
         this.leancloudRequest({
             url: `${HOST}/classes/MovieData?limit=${LIMIT}&where=${whereStr}`,
             success: (data) => {
-                if (!data) {
-                    return;
-                }
                 let arr = data.results;
                 let _data = {},
                     idSets = new Set();
@@ -49,7 +59,6 @@ var load = {
             likeItem.set('user', user);
 
             likeItem.save().then(function(data) {
-                console.log(data)
             }, function(error) {
                 console.error(error);
             });

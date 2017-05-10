@@ -53,3 +53,15 @@
     padding-top: 6px;
     font-size: 15px;
 }
+.end{
+    display:flex;
+    justify-content:center;
+    color:rgba(0,0,0,0.7);
+}
+.noList{
+    padding-top:30px;
+}
+.noMore{
+    font-size:16px;
+    padding:0px 0px 5px 0px;
+}

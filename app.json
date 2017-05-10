@@ -7,7 +7,7 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "demo",
+    "navigationBarTitleText": "电影心愿单",
     "navigationBarTextStyle": "black"
   }
 }

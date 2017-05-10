@@ -1,6 +1,6 @@
 <view class="container">
     <scroll-view wx:if="{{!isEmpty}}" class="list" scroll-y="true" style="height:{{windowHeight}}px;" bindscrolltolower="lower">
-        <view class="movie" wx:for="{{listArr}}">
+        <view class="movie" wx:for="{{listArr}}" wx:if="{{!isLoadingEnd}}">
             <image class="pic" src="{{movieData[item].picUrl}}"></image>
             <view class="box">
                 <text class="name">{{movieData[item].name}}</text>
@@ -10,7 +10,7 @@
                 </view>
             </view>
         </view>
-        <view wx:if="{{isLoadingEnd}}" class="end noMore">没有更多了~</view>
+        <view wx:elif="{{isLoadingEnd}}" class="noMore">没有更多了~</view>
     </scroll-view>
-    <view wx:elif="{{isEmpty}}" class="end noList">暂时没有喜欢的电影~</view>
+    <view wx:elif="{{isEmpty}}" class="noList">暂时没有喜欢的电影~</view>
 </view>

@@ -14,6 +14,7 @@ let touch = {
 };
 Page({
     data: {
+        isLoadingEnd: false,
         slideTimes: 0,
         userInfo: {},
         touchDot: 0, //触摸时的原点
@@ -28,11 +29,14 @@ Page({
         movieData: {}
     },
     onLoad: function(option) {
+        wx.showLoading({
+            title: '加载中...',
+        })
         let isShowId, listArr;
         let movieData = this.data.movieData;
         this.setData({
-          windowHeight:app.globalData.windowInfo.height,
-          windowWidth:app.globalData.windowInfo.width
+            windowHeight: app.globalData.windowInfo.height,
+            windowWidth: app.globalData.windowInfo.width
         })
         let that = this;
         app.getUserInfo(function(userInfo) {
@@ -46,6 +50,7 @@ Page({
                 movieData,
                 idSets
             }) => {
+                wx.hideLoading();
                 listArr = Array.from(idSets);
                 isShowId = listArr[0];
                 for (let i = 0; i < listArr.length; i++) {
@@ -121,7 +126,7 @@ Page({
         })
         if (time < 150) {
             //快速滑动
-            if (translateX > 60) {
+            if (translateX > 40) {
                 //右划
                 console.log('右划...')
                 this.markAsRead();
@@ -131,7 +136,12 @@ Page({
                 this.setData({
                     movieData
                 })
-            } else if (translateX < -60) {
+                load.likeAction({
+                    action: 'like',
+                    uid: app.globalData.userInfo.objectId,
+                    objectId: id
+                })
+            } else if (translateX < -40) {
                 //左划
                 console.log('左划...')
                 this.markAsRead();
@@ -160,6 +170,11 @@ Page({
                 movieData[id].animationData = animation.export();
                 this.setData({
                     movieData
+                })
+                load.likeAction({
+                    action: 'like',
+                    uid: app.globalData.userInfo.objectId,
+                    objectId: id
                 })
             } else if (translateX < -160) {
                 //左划
@@ -228,7 +243,7 @@ Page({
         });
         let slideTimes = this.data.slideTimes;
         slideTimes++;
-        if (length <= 1) {
+        if (length <= 3) {
             this.loadMore();
         }
         let i = listArr.indexOf(id);
@@ -240,6 +255,11 @@ Page({
         })
         if (this.data.slideTimes >= 4) {
             this.deleteItem(id)
+        }
+        try {
+            wx.setStorageSync('lastViewId', id)
+        } catch (e) {
+            console.log(e)
         }
     },
     clickAnimation: function(params) {
@@ -274,30 +294,34 @@ Page({
     loadMore: function() {
         console.log('more')
         let _movieData, _listArr, _isShowId, fromId;
-        fromId = [].concat(this.data.listArr).pop()
-        load.getMovieData({
-            fromId: fromId,
-            success: ({
-                movieData,
-                idSets,
-            }) => {
-                if (idSets.size === '0') {
-                    alert('当前暂时没有新的电影了~');
-                    return;
+        fromId = [].concat(this.data.listArr).pop();
+        if (!this.data.isLoadingEnd) {
+            load.getMovieData({
+                fromId: fromId,
+                success: ({
+                    movieData,
+                    idSets,
+                }) => {
+                    if (idSets.size === 0) {
+                        this.setData({
+                            isLoadingEnd: true
+                        })
+                        return;
+                    }
+                    _movieData = Object.assign({}, this.data.movieData, movieData);
+                    _listArr = Array.from(idSets);
+                    for (let i = 0; i < _listArr.length; i++) {
+                        _movieData[_listArr[i]].zIndex = --zIndex;
+                        _movieData[_listArr[i]].isRender = true;
+                    }
+                    let listArrPlus = this.data.listArr.concat(_listArr);
+                    this.setData({
+                        movieData: _movieData,
+                        listArr: listArrPlus
+                    })
                 }
-                _movieData = Object.assign({}, this.data.movieData, movieData);
-                _listArr = Array.from(idSets);
-                for (let i = 0; i < _listArr.length; i++) {
-                    _movieData[_listArr[i]].zIndex = --zIndex;
-                    _movieData[_listArr[i]].isRender = true;
-                }
-                let listArrPlus = this.data.listArr.concat(_listArr);
-                this.setData({
-                    movieData: _movieData,
-                    listArr: listArrPlus
-                })
-            }
-        })
+            })
+        }
     },
     deleteItem: function(id) {
         let index = this.data.listArr.indexOf(id);
@@ -306,7 +330,7 @@ Page({
         if (index >= 3) {
             setTimeout(() => {
                 let movieData = Object.assign({}, this.data.movieData);
-                for (let i = 0; i < index - 2; i++) {
+                for (let i = 0; i < index - 3; i++) {
                     let id = listArr[i];
                     movieData[id].isRender = false;
                 }
@@ -317,7 +341,6 @@ Page({
             }, 1000)
 
         }
-        console.log('delete', this.data.listArr)
     },
     toUserList: function() {
         try {
@@ -328,6 +351,19 @@ Page({
             console.log(e);
         } finally {
 
+        }
+    },
+    onShareAppMessage: function() {
+        return {
+            title: '电影心愿单',
+            path: '/page/index',
+            success: function(res) {
+                // 转发成功
+            },
+            fail: function(res) {
+                // 转发失败
+                console.log(res)
+            }
         }
     }
 })
