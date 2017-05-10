@@ -1,39 +1,41 @@
-<!--index.wxml-->
+
 <view class="container">
-<view class="index-container">
-    <view class="movie-container first" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
-        <view class="pic-container">
-            <view class="pic-box">
-                <view class="mask"></view>
-                <image class="pic" src="{{movieData[isShowId].picObj.url}}">
-                </image>
+    <scroll-view class="page-container">
+        <view class="list-container" style="width:{{windowWidth}}px;">
+            <view wx:for="{{listArr}}" wx:key="{{item}}" >
+            <block wx:if="{{movieData[item].isRender}}">
+            <view style="z-index:{{movieData[item].zIndex}};" class="item-container" animation="{{movieData[item].animationData}}"  bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
+                <view class="pic-box">
+                    <image class="pic" mode="scaleToFill" src="{{movieData[item].picUrl}}"></image>
+                    <view class="mask"></view>
+                    <view class="text-box">
+                        <text class="cn-name">{{movieData[item].name}}</text>
+                        <view class="score-box">
+                            <text class="score-name">豆瓣评分：{{listArr.length}}</text>
+                            <text class="score">{{movieData[item].score}}</text>
+                        </view>
+                    </view>
+                </view>
+                </view>
+                </block>
             </view>
-            <view class="text-box">
-                <text class="cn-name">{{movieData[isShowId].cnName}}</text>
-                <view class="score-box">
-                    <text class="score-name">豆瓣评分：</text>
-                    <text class="score">{{movieData[isShowId].score}}</text>
+        </view>
+        <view class="buttons">
+            <view class="round-container" bindtap="onUnlike">
+                <view class="cross">
+                    <image class="icon cross-icon" src="../../icon/cross.png"></image>
+                </view>
+            </view>
+            <view class="round-container round-big">
+                <view bindtap="toUserList" class="userinfo">
+                    <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" background-size="cover"></image>
+                </view>
+            </view>
+            <view class="round-container" bindtap="onLike">
+                <view class="heart" >
+                    <image class="icon heart-icon" src="../../icon/heart_big.png"></image>
                 </view>
             </view>
         </view>
-    </view>
-    <view class="movie-container second" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
-        <view class="pic-container">
-            <view class="mask"></view>
-            <image class="pic" src="../../one.jpeg">
-            </image>
-            <view class="text-box">
-                <text class="cn-name">{{movieData[isShowId].cnName}}</text>
-                <view class="score-box">
-                    <text class="score-name">豆瓣评分：</text>
-                    <text class="score">{{movieData[isShowId].score}}</text>
-                </view>
-            </view>
-        </view>
-    </view>
-    <!--<view class="detail-box">
-            <view class="detail-name">剧情简介</view>
-            <text class="detail">{{movieData[isShowId].detail}}</text>
-        </view>-->
-</view>
+    </scroll-view>
 </view>

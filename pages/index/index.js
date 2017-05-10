@@ -1,148 +1,333 @@
-//index.js
 //获取应用实例
-var app = getApp()
-var defaultData = {
-    touchDot: 0, //触摸时的原点
-    time: 0, //  时间记录，用于滑动时且时间小于1s则执行左右滑动
-    interval: "", // 记录/清理 时间记录
-    unReadArr: [
-       7797268,7797269
-    ],
-    likeArr: [],
-    unlikeArr: [],
-    movieData: {
-        7797267: {
-            messageId: 7797267,
-            picObj: {
-                width: 600,
-                height: 337,
-                url: '../../fine.jpg'
-            },
-            cnName: '你的名字你的名字你的名字你的名字',
-            score: '8.4',
-            detail: '在远离大都会的小山村，住着巫女世家出身的高中女孩宫水三叶（上白石萌音 配音）。校园和家庭的原因本就让她充满烦恼，而近一段时间发生的奇怪事件，又让三叶摸不清头脑。不知从何时起，...',
-            liked: 0,
-            isShow: true
-        },
-        7797268: {
-            detail: "《一条狗的使命》3月3日上映，豆瓣8分。 拉斯·霍尔斯道姆执导，影片讲述了一条狗经历多次重生，在一次次生命的轮回中寻找不同的使命，最后又回到了最初的主人身边的故事。豆瓣热门短评：“催泪型温情片，故事比较俗套但是不影响好看啊。”",
-            messageId: 7797268,
-            cnName: "一条狗的使命",
-            score: 8.0,
-            picObj: {
-                width: 424,
-                height: 600,
-                url: "https://cdn.ruguoapp.com/FueNyDQcxhc9o0zeQjtqhTGOXPOd.jpg?imageView2/0/h/1000/interlace/0/q/80"
-            },
-            liked: 0,
-            isShow: false
-        },
-        7797269: {
-            messageId: 7797269,
-            picObj: {
-                width: 600,
-                height: 337,
-                url: '../../fine.jpg'
-            },
-            cnName: '金刚狼3：殊死一战',
-            score: '8.3',
-            detail: '詹姆斯·曼高德执导，休·杰克曼最后一次饰演金刚狼。该片根据漫威漫画改编，故事背景设定在2029年，讲述迈入暮年的金刚狼渐渐失去了体内的自愈因子，当一个与他能力相似的变种人劳拉出现，金刚狼决定出山保护劳拉的故事。',
-            liked: 0,
-            isShow: false
-        },
-    }
-}
-defaultData.isShowId = defaultData.unReadArr[0];
+let app = getApp();
+const AV = require('../../utils/av-weapp-min.js');
+let load = require('../../load.js')
+
+let zIndex = 10000 //zindex全局变量
+let touch = {
+    //拖拽数据
+    startPoint: null,
+    translateX: null,
+    translateY: null,
+    timeStampStart: null,
+    timeStampEnd: null
+};
 Page({
-    data: defaultData,
-    touchStart: function(e) {
-        var touchDot = e.touches[0].pageX; // 获取触摸时的原点
-        this.setData({
-            touchDot
-        })
+    data: {
+        slideTimes: 0,
+        userInfo: {},
+        touchDot: 0, //触摸时的原点
+        coord: {
+            x: 0,
+            y: 0
+        },
+        idSets: null,
+        listArr: null,
+        likeArr: [],
+        unlikeArr: [],
+        movieData: {}
     },
     onLoad: function(option) {
-        // 页面初始化 options为页面跳转所带来的参数
-        var windowWidth, windowHeight;
-        var movieData = this.data.movieData,
-            isShowId = this.data.isShowId;
-        wx.getSystemInfo({
-            success: function(res) {
-                windowWidth = res.windowWidth;
-                windowHeight = res.windowHeight;
+        let isShowId, listArr;
+        let movieData = this.data.movieData;
+        this.setData({
+          windowHeight:app.globalData.windowInfo.height,
+          windowWidth:app.globalData.windowInfo.width
+        })
+        let that = this;
+        app.getUserInfo(function(userInfo) {
+            //更新数据
+            that.setData({
+                userInfo
+            })
+        })
+        load.getMovieData({
+            success: ({
+                movieData,
+                idSets
+            }) => {
+                listArr = Array.from(idSets);
+                isShowId = listArr[0];
+                for (let i = 0; i < listArr.length; i++) {
+                    movieData[listArr[i]].zIndex = --zIndex;
+                }
+                that.setData({
+                    movieData,
+                    idSets,
+                    isShowId,
+                    listArr
+                })
             }
-        })
-        this.setData({
-            windowWidth,
-            windowHeight
-        })
-    },
-    // 触摸移动事件
-    touchMove: function(e) {
-        var touchMove = e.touches[0].pageX,
-            time = this.data.time,
-            touchDot = this.data.touchDot;
-        // console.log("touchMove:" + touchMove + " touchDot:" + touchDot + " diff:" + (touchMove - touchDot));
-        // 向左滑动
-        if (touchMove - touchDot <= -100 && time < 5) {
-            console.log('向左');
-            this.likeAction({
-                action: "unlike"
-            });
-            this.markAsRead();
-        }
-        // 向右滑动
-        if (touchMove - touchDot >= 100 && time < 5) {
-            console.log('向右');
-            this.likeAction({
-                action: "like"
-            });
-            this.markAsRead();
-        }
-        // touchDot = touchMove; //每移动一次把上一次的点作为原点（好像没啥用）
-    },
-    // 触摸结束事件
-    touchEnd: function(e) {
-        var interval = this.data.interval;
-        clearInterval(interval); // 清除setInterval
-        this.setData({
-            time: 0,
-            tmpFlag: true // 回复滑动事件
         })
 
     },
-    likeAction: function(params) {
-        let id = this.data.isShowId;
-        let obj = this.data.movieData;
-        let likeArr = [],
-            unlikeArr = [];
-        if (params.action === 'like') {
-            obj[id].liked = 1;
-            // let likeData = this.data.likeArr.splice(obj[id], 1);
-            likeArr.push(id);
-            console.log(likeArr);
-        } else if (params.action === 'unlike') {
-            obj[id].liked = 2;
-            unlikeArr.push(id);
+
+    touchStart: function(e) {
+        touch.startPoint = e.touches[0];
+        let timeStampStart = new Date().getTime();
+        this.animation = wx.createAnimation({
+            duration: 70,
+            timingFunction: 'ease',
+            delay: 0
+        })
+        this.touch = {
+            timeStampStart
         }
+
+    },
+    //触摸移动事件
+    touchMove: function(e) {
+        let movieData, rotate;
+        let currentPoint = e.touches[e.touches.length - 1];
+        let translateX = currentPoint.clientX - touch.startPoint.clientX;
+        let translateY = currentPoint.clientY - touch.startPoint.clientY;
+
+        if (translateX < 0) {
+            if (translateX > -10) {
+                rotate = -1;
+            } else {
+                rotate = -4;
+            }
+        }
+        if (translateX > 0) {
+            if (translateX < 10) {
+                rotate = 1;
+            } else {
+                rotate = 4;
+            }
+        }
+        this.animation.rotate(rotate).translate(translateX, 10).step();
+        let id = this.data.isShowId;
+        movieData = this.data.movieData;
+        movieData[id].animationData = this.animation.export();
         this.setData({
-            movieData: obj,
-            likeArr,
+            movieData
+        })
+
+    },
+    // 触摸结束事件
+    touchEnd: function(e) {
+        // return;
+        let movieData;
+        let translateX = e.changedTouches[0].clientX - touch.startPoint.clientX;
+        let translateY = e.changedTouches[0].clientY - touch.startPoint.clientY;
+        let timeStampEnd = new Date().getTime();
+        let time = timeStampEnd - this.touch.timeStampStart;
+        let id = this.data.isShowId;
+        let animation = wx.createAnimation({
+            duration: 250,
+            timingFunction: 'ease',
+            delay: 0
+        })
+        if (time < 150) {
+            //快速滑动
+            if (translateX > 60) {
+                //右划
+                console.log('右划...')
+                this.markAsRead();
+                animation.rotate(0).translate(this.data.windowWidth, 0).step();
+                movieData = this.data.movieData;
+                movieData[id].animationData = animation.export();
+                this.setData({
+                    movieData
+                })
+            } else if (translateX < -60) {
+                //左划
+                console.log('左划...')
+                this.markAsRead();
+                animation.rotate(0).translate(-this.data.windowWidth, 0).step();
+                movieData = this.data.movieData;
+                movieData[id].animationData = animation.export();
+                this.setData({
+                    movieData
+                })
+            } else {
+                //返回原位置
+                animation.rotate(0).translate(0, 0).step();
+                movieData = this.data.movieData;
+                movieData[this.data.isShowId].animationData = animation.export();
+                this.setData({
+                    movieData,
+                })
+            }
+        } else {
+            if (translateX > 160) {
+                //右划
+                console.log('右划...')
+                this.markAsRead();
+                animation.rotate(0).translate(this.data.windowWidth, 0).step();
+                movieData = this.data.movieData;
+                movieData[id].animationData = animation.export();
+                this.setData({
+                    movieData
+                })
+            } else if (translateX < -160) {
+                //左划
+                console.log('左划...')
+                this.markAsRead();
+                animation.rotate(0).translate(-this.data.windowWidth, 0).step();
+                movieData = this.data.movieData;
+                movieData[id].animationData = animation.export();
+                this.setData({
+                    movieData
+                })
+            } else {
+                //返回原位置
+                animation.rotate(0).translate(0, 0).step();
+                movieData = this.data.movieData;
+                movieData[this.data.isShowId].animationData = animation.export();
+                this.setData({
+                    movieData,
+                })
+            }
+        }
+    },
+
+    onLike: function() {
+        this.clickAnimation({
+            direction: 'right'
+        });
+        let id = this.data.isShowId;
+        let likeArr = this.data.likeArr;
+        likeArr.push(id);
+        this.setData({
+            likeArr
+        })
+        this.markAsRead();
+        load.likeAction({
+            action: 'like',
+            uid: app.globalData.userInfo.objectId,
+            objectId: id
+        })
+    },
+    onUnlike: function() {
+        this.clickAnimation({
+            direction: 'left'
+        });
+        let id = this.data.isShowId;
+        let unlikeArr = this.data.unlikeArr;
+        unlikeArr.push(id);
+
+        this.setData({
             unlikeArr
         })
-        console.log(this.data);
+        this.markAsRead();
+        load.likeAction({
+            action: 'unlike',
+            uid: app.globalData.userInfo.objectId,
+            objectId: id
+        })
     },
     markAsRead: function() {
         let id = this.data.isShowId;
         let movieData = this.data.movieData;
-        let unReadArr = this.data.unReadArr;
-        let nextId = unReadArr[1],
-            nowId = unReadArr[0];
-        movieData[nowId].isShow = false;
-        movieData[nextId].isShow = true;
+        let listArr = this.data.listArr;
+        let length = this.finRemainArrLength({
+            listArr,
+            id
+        });
+        let slideTimes = this.data.slideTimes;
+        slideTimes++;
+        if (length <= 1) {
+            this.loadMore();
+        }
+        let i = listArr.indexOf(id);
+        let nextId = listArr[i + 1];
+
         this.setData({
-            isShowId: unReadArr[1]
+            isShowId: nextId,
+            slideTimes
         })
-        unReadArr.splice(id, 1);
+        if (this.data.slideTimes >= 4) {
+            this.deleteItem(id)
+        }
+    },
+    clickAnimation: function(params) {
+        let x, y, duration, rotate, movieData;
+        duration = 700;
+        y = 100;
+        if (params.direction === 'left') {
+            rotate = -10;
+            x = -this.data.windowWidth - 100;
+        } else {
+            rotate = 10;
+            x = this.data.windowWidth + 100;
+        }
+
+        this.animation = wx.createAnimation({
+            duration,
+            timingFunction: 'ease',
+            delay: 0
+        })
+        let id = this.data.isShowId;
+        this.animation.rotate(rotate).translate(x, y).step();
+        movieData = this.data.movieData;
+        movieData[id].animationData = this.animation.export();
+        this.setData({
+            movieData
+        })
+    },
+    finRemainArrLength: function(params) {
+        let i = params.listArr.indexOf(params.id) + 1;
+        return params.listArr.slice(i).length;
+    },
+    loadMore: function() {
+        console.log('more')
+        let _movieData, _listArr, _isShowId, fromId;
+        fromId = [].concat(this.data.listArr).pop()
+        load.getMovieData({
+            fromId: fromId,
+            success: ({
+                movieData,
+                idSets,
+            }) => {
+                if (idSets.size === '0') {
+                    alert('当前暂时没有新的电影了~');
+                    return;
+                }
+                _movieData = Object.assign({}, this.data.movieData, movieData);
+                _listArr = Array.from(idSets);
+                for (let i = 0; i < _listArr.length; i++) {
+                    _movieData[_listArr[i]].zIndex = --zIndex;
+                    _movieData[_listArr[i]].isRender = true;
+                }
+                let listArrPlus = this.data.listArr.concat(_listArr);
+                this.setData({
+                    movieData: _movieData,
+                    listArr: listArrPlus
+                })
+            }
+        })
+    },
+    deleteItem: function(id) {
+        let index = this.data.listArr.indexOf(id);
+        let listArr = [].concat(this.data.listArr);
+        let _listArr;
+        if (index >= 3) {
+            setTimeout(() => {
+                let movieData = Object.assign({}, this.data.movieData);
+                for (let i = 0; i < index - 2; i++) {
+                    let id = listArr[i];
+                    movieData[id].isRender = false;
+                }
+                this.setData({
+                    slideTimes: 0,
+                    movieData
+                })
+            }, 1000)
+
+        }
+        console.log('delete', this.data.listArr)
+    },
+    toUserList: function() {
+        try {
+            wx.navigateTo({
+                url: '../like/like'
+            });
+        } catch (e) {
+            console.log(e);
+        } finally {
+
+        }
     }
 })

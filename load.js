@@ -3,10 +3,11 @@ import {
     LIMIT
 } from 'constans.js';
 
-var getList = {
+const AV = require('./utils/av-weapp-min.js');
+
+var load = {
     getMovieData: function(params) {
         let objectId = params.fromId;
-        console.log(params)
         let where = {};
         if (objectId) {
             where.objectId = {
@@ -15,14 +16,12 @@ var getList = {
         }
         let whereStr = encodeURIComponent(JSON.stringify(where))
         this.leancloudRequest({
-            url: `${HOST}/classes/TodoFolder?limit=${LIMIT}&where=${whereStr}`,
+            url: `${HOST}/classes/MovieData?limit=${LIMIT}&where=${whereStr}`,
             success: (data) => {
                 if (!data) {
-                    // alert('当前暂时没有新的电影了~');
                     return;
                 }
-                // let arr = data.data;
-                let arr = data;
+                let arr = data.results;
                 let _data = {},
                     idSets = new Set();
                 for (let i = 0; i < arr.length; ++i) {
@@ -38,14 +37,23 @@ var getList = {
             }
         })
     },
-    clickLike: function() {
-        this.leancloudRequest({
-            url: `${HOST}/classes/LikeList?page=${page}`,
-            method: "POST",
-            success: () => {
+    likeAction: function(params) {
+        if (params.action === 'like') {
+            var LikeList = AV.Object.extend('LikeList');
+            var likeItem = new LikeList();
 
-            }
-        })
+            var movie = AV.Object.createWithoutData('MovieData', params.objectId);
+            var user = AV.Object.createWithoutData('_User', params.uid);
+
+            likeItem.set('movie', movie);
+            likeItem.set('user', user);
+
+            likeItem.save().then(function(data) {
+                console.log(data)
+            }, function(error) {
+                console.error(error);
+            });
+        }
     },
     request: function(params) {
         let url = `${params.url}`;
@@ -78,25 +86,26 @@ var getList = {
         let url = `${params.url}`;
         let method = params.method;
 
-        if (method == 'POST' || method == 'DELETE') {
-            var obj = {
-                method: params.method,
-                mode: 'cors'
-            };
-            obj.body = JSON.stringify(params.body);
+        let header, body;
+        if (method === 'POST' || method === 'PUT') {
+            body = params.body;
+        } else {
+            body = '';
         }
+        header = {
+            'Content-Type': 'application/json',
+            "X-LC-Id": "FTwd0NMfXvTdENGONHoT5FAp-gzGzoHsz",
+            "X-LC-Key": "v6qtxRqeTEjz3Xm0VI7T0kNx"
+        }
+
         wx.request({
             url: url,
             method: method || "GET",
-            data: method === 'GET' ? null : obj,
-            header: {
-                'content-type': 'application/json',
-                "X-LC-Id": "FTwd0NMfXvTdENGONHoT5FAp-gzGzoHsz",
-                "X-LC-Key": "v6qtxRqeTEjz3Xm0VI7T0kNx"
-            },
+            data: body,
+            header,
             success: function(res) {
                 try {
-                    params.success(res.data.results);
+                    params.success(res.data);
                 } catch (e) {
                     console.log(e)
                 }
@@ -105,4 +114,4 @@ var getList = {
     }
 }
 
-module.exports = getList;
+module.exports = load;

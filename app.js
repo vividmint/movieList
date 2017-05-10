@@ -1,27 +1,30 @@
-//app.js
+const AV = require('./utils/av-weapp-min.js');
+AV.init({
+    appId: 'FTwd0NMfXvTdENGONHoT5FAp-gzGzoHsz',
+    appKey: 'v6qtxRqeTEjz3Xm0VI7T0kNx',
+});
+const user = AV.User.current();
 
 App({
-    onLaunch: function() {},
-    getUserInfo: function(cb) {
-        var that = this;
-        if (this.globalData.userInfo) {
-            typeof cb == "function" && cb(this.globalData.userInfo)
-        } else {
-            //调用登录接口
-            wx.login({
-                success: function() {
-                    wx.getUserInfo({
-                        success: function(res) {
-                            that.globalData.userInfo = res.userInfo
-                            typeof cb == "function" && cb(that.globalData.userInfo)
-                        }
-                    })
-                }
-            })
+    onLaunch: function() {
+        try {
+            var res = wx.getSystemInfoSync()
+            this.globalData.windowInfo.width = res.windowWidth;
+            this.globalData.windowInfo.height = res.windowHeight;
+        } catch (e) {
+          console.log(e)
+            // Do something when catch error
         }
     },
+    getUserInfo: function(cb) {
+        AV.User.loginWithWeapp().then(userInfo => {
+            this.globalData.userInfo = userInfo.toJSON();
+            cb(this.globalData.userInfo);
+        }).catch(console.error);
+    },
     globalData: {
+        movieData: null,
         userInfo: null,
-        movieData: null
+        windowInfo: {}
     }
 })
