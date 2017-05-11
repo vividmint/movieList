@@ -2,6 +2,7 @@ import {
     HOST,
     LIMIT
 } from 'constans.js';
+let app = getApp();
 
 const AV = require('./utils/av-weapp-min.js');
 
@@ -20,7 +21,6 @@ var load = {
                 console.log(e)
             }
         }
-
         let where = {};
         if (objectId) {
             where.objectId = {
@@ -58,8 +58,7 @@ var load = {
             likeItem.set('movie', movie);
             likeItem.set('user', user);
 
-            likeItem.save().then(function(data) {
-            }, function(error) {
+            likeItem.save().then(function(data) {}, function(error) {
                 console.error(error);
             });
         }

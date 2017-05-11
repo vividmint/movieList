@@ -1,6 +1,0 @@
-<!--demo.wxml-->
-<text>demo.wxml</text>
-<view wx:for="{{list}}">
-<view animation="{{item.animationData}}" style="z-index:1;">{{item.text}}</view>
-<button size="mini" bindtap="ontap"  data-id='{{item.id}}'>点击</button>
-</view>

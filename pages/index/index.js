@@ -44,26 +44,28 @@ Page({
             that.setData({
                 userInfo
             })
-        })
-        load.getMovieData({
-            success: ({
-                movieData,
-                idSets
-            }) => {
-                wx.hideLoading();
-                listArr = Array.from(idSets);
-                isShowId = listArr[0];
-                for (let i = 0; i < listArr.length; i++) {
-                    movieData[listArr[i]].zIndex = --zIndex;
-                }
-                that.setData({
+            load.getMovieData({
+                fromId: userInfo.lastViewId,
+                success: ({
                     movieData,
-                    idSets,
-                    isShowId,
-                    listArr
-                })
-            }
+                    idSets
+                }) => {
+                    wx.hideLoading();
+                    listArr = Array.from(idSets);
+                    isShowId = listArr[0];
+                    for (let i = 0; i < listArr.length; i++) {
+                        movieData[listArr[i]].zIndex = --zIndex;
+                    }
+                    that.setData({
+                        movieData,
+                        idSets,
+                        isShowId,
+                        listArr
+                    })
+                }
+            })
         })
+
 
     },
 
@@ -86,7 +88,6 @@ Page({
         let currentPoint = e.touches[e.touches.length - 1];
         let translateX = currentPoint.clientX - touch.startPoint.clientX;
         let translateY = currentPoint.clientY - touch.startPoint.clientY;
-
         if (translateX < 0) {
             if (translateX > -10) {
                 rotate = -1;
@@ -128,7 +129,6 @@ Page({
             //快速滑动
             if (translateX > 40) {
                 //右划
-                console.log('右划...')
                 this.markAsRead();
                 animation.rotate(0).translate(this.data.windowWidth, 0).step();
                 movieData = this.data.movieData;
@@ -143,7 +143,6 @@ Page({
                 })
             } else if (translateX < -40) {
                 //左划
-                console.log('左划...')
                 this.markAsRead();
                 animation.rotate(0).translate(-this.data.windowWidth, 0).step();
                 movieData = this.data.movieData;
@@ -163,7 +162,6 @@ Page({
         } else {
             if (translateX > 160) {
                 //右划
-                console.log('右划...')
                 this.markAsRead();
                 animation.rotate(0).translate(this.data.windowWidth, 0).step();
                 movieData = this.data.movieData;
@@ -178,7 +176,6 @@ Page({
                 })
             } else if (translateX < -160) {
                 //左划
-                console.log('左划...')
                 this.markAsRead();
                 animation.rotate(0).translate(-this.data.windowWidth, 0).step();
                 movieData = this.data.movieData;
@@ -256,11 +253,15 @@ Page({
         if (this.data.slideTimes >= 4) {
             this.deleteItem(id)
         }
-        try {
-            wx.setStorageSync('lastViewId', id)
-        } catch (e) {
-            console.log(e)
-        }
+
+        this.saveLastViewId(id);
+    },
+    saveLastViewId: function(id) {
+        var _user = AV.Object.createWithoutData('_User', this.data.userInfo.objectId);
+        // 修改属性
+        _user.set('lastViewId', id);
+        // 保存到云端
+        _user.save();
     },
     clickAnimation: function(params) {
         let x, y, duration, rotate, movieData;
@@ -292,7 +293,6 @@ Page({
         return params.listArr.slice(i).length;
     },
     loadMore: function() {
-        console.log('more')
         let _movieData, _listArr, _isShowId, fromId;
         fromId = [].concat(this.data.listArr).pop();
         if (!this.data.isLoadingEnd) {
@@ -356,7 +356,7 @@ Page({
     onShareAppMessage: function() {
         return {
             title: '电影心愿单',
-            path: '/page/index',
+            path: '/pages/index/index',
             success: function(res) {
                 // 转发成功
             },

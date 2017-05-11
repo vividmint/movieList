@@ -37,7 +37,7 @@
     width: 100%;
     height: 100%;
     top: 0;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.2);
     position: absolute;
     border-radius: 10px;
 }
@@ -52,13 +52,13 @@
 .cn-name {
     font-size: 26px;
     font-weight: 700;
+    line-height: 1.3;
 
 }
 
 .score-box {
-    padding-top: 30rpx;
+    padding-top: 15rpx;
     font-size: 22px;
-
 }
 
 .score {

@@ -111,7 +111,7 @@ Page({
     onShareAppMessage: function() {
         return {
             title: '电影心愿单',
-            path: '/page/index',
+            path: '/pages/index/index',
             success: function(res) {
                 // 转发成功
             },

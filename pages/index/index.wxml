@@ -4,8 +4,8 @@
         <view class="list-container"  wx:if="{{!isLoadingEnd}}" style="width:{{windowWidth}}px;">
             <view wx:for="{{listArr}}" wx:key="{{item}}">
             <block wx:if="{{movieData[item].isRender}}">
-            <view style="z-index:{{movieData[item].zIndex}};" class="item-container" animation="{{movieData[item].animationData}}"  bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
-                <view class="pic-box">
+            <view style="z-index:{{movieData[item].zIndex}};" class="item-container" animation="{{movieData[item].animationData}}" >
+                <view class="pic-box" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
                     <image class="pic" mode="scaleToFill" src="{{movieData[item].picUrl}}"></image>
                     <view class="mask"></view>
                     <view class="text-box">

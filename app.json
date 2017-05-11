@@ -1,7 +1,6 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/user/user",
     "pages/like/like"
   ],
   "window": {
