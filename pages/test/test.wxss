@@ -1,0 +1,76 @@
+.list {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    padding: 0px 10px 10px 10px;
+}
+.movie{
+    display:flex;
+    border-bottom: 2rpx solid rgb(245, 245, 245);
+    align-items: center;
+    padding:10px 0px;
+}
+.movie-upper {
+    display:flex;
+    box-sizing: border-box;
+    position: relative;
+    z-index:2;
+    width:100%;
+}
+.delete-box {
+    z-index:1;
+    background-color:rgb(182,74,75);
+    color:white;
+    height:100%;
+    width:60px;
+}
+.pic {
+    width: 50px;
+    height: 70px;
+    flex: 0 0 50px;
+    padding: 0px 0px 0px 20rpx;
+}
+
+.heart {
+    /*color:#d43242;*/
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 5px;
+    left: 75px;
+}
+
+.box {
+    display: flex;
+    flex: 0 1 auto;
+    flex-direction: column;
+    padding: 5px 20px;
+    justify-content: center;
+}
+
+.name {
+    color: rgba(0, 0, 0, 0.8);
+    font-size: 18px;
+    text-overflow: ellipsis;
+    width: 200px;
+    overflow:hidden;
+    white-space: nowrap;
+}
+
+.score-box {
+    color: rgba(0, 0, 0, 0.5);
+    padding-top: 6px;
+    font-size: 15px;
+}
+.end{
+    display:flex;
+    justify-content:center;
+    color:rgba(0,0,0,0.7);
+}
+.noList{
+    padding-top:30px;
+}
+.noMore{
+    font-size:16px;
+    padding:0px 0px 5px 0px;
+}

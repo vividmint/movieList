@@ -10,6 +10,7 @@ var app = getApp()
 Page({
     data: {
         isEmpty: false,
+        isLoading: false,
         isLoadingEnd: false,
         movieData: {
 
@@ -47,19 +48,25 @@ Page({
                     let listArr = [].concat(this.data.listArr),
                         movieData = Object.assign({}, this.data.movieData);
                     for (let i = 0; i < data.length; ++i) {
-                        let id = data[i].id;
-                        listArr.push(data[i].id);
-                        movieData[id] = data[i].attributes.movie.attributes;
+                        // let id = data[i].id;
+                        let id = data[i].attributes.messageId;
+                        listArr.push(id);
+                        // movieData[id] = data[i].attributes.movie.attributes;
+                        movieData[id] = data[i].attributes;
                     }
                     this.setData({
                         listArr,
                         movieData
                     })
+                    console.log(this.data)
                 }
             });
         })
     },
     getList: function(params) {
+        this.setData({
+            isLoading: true
+        })
         var query = new AV.Query('LikeList');
         var user = AV.Object.createWithoutData('_User', app.globalData.userInfo.objectId);
         query.equalTo('user', user);
@@ -72,13 +79,20 @@ Page({
         query.limit(`${LIKELIMIT}`); // 最多返回 10 条结果
 
         query.find().then(data => {
+          console.log('here',data);
             params.success(data);
+            this.setData({
+                isLoading: false
+            })
         }).catch(e => {
+            this.setData({
+                isLoading: false
+            })
             console.log(e)
         })
     },
     lower: function() {
-        if (!this.data.isLoadingEnd) {
+        if (!this.data.isLoadingEnd && !this.data.isLoading) {
             wx.showLoading({
                 title: '加载中...',
             })
@@ -107,6 +121,9 @@ Page({
                 }
             });
         }
+    },
+    bindtouchstart: function(e) {
+
     },
     onShareAppMessage: function() {
         return {

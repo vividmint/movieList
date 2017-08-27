@@ -1,0 +1,22 @@
+<view class="container">
+    <scroll-view wx:if="{{!isEmpty}}" class="list" scroll-y="true" style="height:{{windowHeight}}px;" bindscrolltolower="lower">
+        <view class="movie-list">
+            <view class="movie" wx:for="{{listArr}}" bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
+                <view class="movie-upper">
+                    <image class="pic" src="{{movieData[item].picUrl}}"></image>
+                    <view class="box">
+                        <text class="name">{{movieData[item].name}}</text>
+                        <view class="score-box">
+                            <text class="score-name">豆瓣评分：</text>
+                            <text class="score">{{movieData[item].score}}</text>
+                        </view>
+                    </view>
+                </view>
+            </view>
+            <view data-index="{{index}}" class="delete-box">删除</view>
+        </view>
+
+        <view wx:if="{{isLoadingEnd}}" class="end noMore">没有更多了~</view>
+    </scroll-view>
+    <view wx:elif="{{isEmpty}}" class="end noList">暂时没有喜欢的电影~</view>
+</view>

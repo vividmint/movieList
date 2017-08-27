@@ -1,0 +1,8 @@
+<view class="container">
+<button type="default" size="{{defaultSize}}" loading="{{loading}}" plain="{{plain}}"
+      disabled="{{disabled}}" bindtap="default" hover-class="other-button-hover"> default </button>
+<button type="primary" size="{{primarySize}}" loading="{{loading}}" plain="{{plain}}"
+      disabled="{{disabled}}" bindtap="primary"> primary </button>
+<button type="warn" size="{{warnSize}}" loading="{{loading}}" plain="{{plain}}"
+      disabled="{{disabled}}" bindtap="warn"> warn </button>
+</view>
